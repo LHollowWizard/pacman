@@ -1,0 +1,1 @@
+write "gem install colorize" in you cmd in order to play the game
