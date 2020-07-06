@@ -11,6 +11,15 @@ def welcome_player
     name
 end
 
+
+def game_over
+    puts "\n\n"
+    puts "=-=-=-=-=-=-=-=-=-".red
+    puts "You lost the game!".red
+    puts "=-=-=-=-=-=-=-=-=-".red
+    puts "\n\n"
+end
+
 def draw_map_in_the_prompt(map_data)
     puts map_data
 end

@@ -34,7 +34,7 @@ def find_player(map_data)
         end
     end
 
-    #No player character
+    false
 end
 
 def find_phantasm(map_data)
@@ -42,20 +42,64 @@ def find_phantasm(map_data)
     phantasms = []
     map_data.each_with_index do |current_line, line_index|
         phantasm_column = current_line.index(phantasm_char)
-        if player_column
-             phantasms << [line_index, player_column]
+        if phantasm_column
+             phantasms << [line_index, phantasm_column]
         end
     end
     phantasms
     #No phantasm character
 end
 
-def move_phantasms(map_data)
+def move_phantasms(map_data, player_position)
     phantasms = find_phantasm(map_data)
 
     phantasms.each do |phantasm|
-        find_path_to_player
+        direction = find_direction(phantasm, player_position, map_data);
+        if is_direction_possible?(direction, phantasm, map_data)
+            map_data[phantasm[0]][phantasm[1]] = "."
+            calculates_new_direction(phantasm, direction)
+            map_data[phantasm[0]][phantasm[1]] = "P"
+        end
     end
+end
+
+def find_direction(phantasm_position, player_position, map_data)
+    line_distance = phantasm_position[0] - player_position[0]
+    column_distance = phantasm_position[1] - player_position[1]
+    
+    if line_distance.abs() >= column_distance.abs() 
+        direction = try_line(line_distance)
+        if is_direction_possible?(direction, phantasm_position, map_data)
+            return direction
+        else
+            return try_column(column_distance)
+        end
+    else
+        direction = try_column(column_distance)
+        if is_direction_possible?(direction, phantasm_position, map_data)
+            return direction
+        else
+            return try_line(line_distance)
+        end      
+    end
+end
+
+def try_line(line_distance)
+    if line_distance >= 0
+            return "W"
+    else
+        return "S"
+    end
+end
+
+
+def try_column(column_distance)
+    if column_distance >= 0
+        return "A"
+    else 
+        return "D"
+    end
+end
 
 def is_direction_possible?(direction, player, map_data)
     temp_player = player.dup
@@ -79,7 +123,6 @@ def is_direction_possible?(direction, player, map_data)
     if colision_with_wall || colision_with_phantasm 
         return false
     end
-
     true
 end    
 
@@ -91,6 +134,10 @@ def play
         system("cls")
         draw_map_in_the_prompt(map)
         player =  find_player(map)
+        if !player
+            game_over
+            break
+        end
 
         loop do
             direction = ask_the_direction
@@ -104,6 +151,7 @@ def play
             puts "The direction you chose has a colision, choose another".red
             draw_map_in_the_prompt(map)
         end
+        move_phantasms(map, player)
     end
 end
 
@@ -111,5 +159,6 @@ def start_game
     loop do
         name = welcome_player
         play
+        gets
     end
 end
