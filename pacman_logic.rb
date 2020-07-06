@@ -12,17 +12,16 @@ def read_map(map_number)
 end
 
 def calculates_new_direction(player, direction)
-    case direction
-    when "W"
-        player[0] -= 1
-    when "S"
-        player[0] += 1
-    when "A"
-        player[1] -= 1
-    when "D"
-        player[1] += 1
-    end
+    movements = {
+        "W" => [-1, 0],
+        "S" => [+1, 0],
+        "A" => [0, -1],
+        "D" => [0, +1]
+        }
 
+    movement = movements[direction]
+    player[0] += movement[0]
+    player[1] += movement[1]
     player
 end
 
@@ -38,18 +37,39 @@ def find_player(map_data)
     #No player character
 end
 
+def find_phantasm(map_data)
+    phantasm_char = "P"
+    phantasms = []
+    map_data.each_with_index do |current_line, line_index|
+        phantasm_column = current_line.index(phantasm_char)
+        if player_column
+             phantasms << [line_index, player_column]
+        end
+    end
+    phantasms
+    #No phantasm character
+end
+
+def move_phantasms(map_data)
+    phantasms = find_phantasm(map_data)
+
+    phantasms.each do |phantasm|
+        find_path_to_player
+    end
+
 def is_direction_possible?(direction, player, map_data)
     temp_player = player.dup
-    case direction
-    when "W"
-        temp_player[0] -= 1
-    when "S"
-        temp_player[0] += 1
-    when "A"
-        temp_player[1] -= 1
-    when "D"
-        temp_player[1] += 1
-    end
+
+    movements = {
+        "W" => [-1, 0],
+        "S" => [+1, 0],
+        "A" => [0, -1],
+        "D" => [0, +1]
+        }
+
+    movement = movements[direction]
+    temp_player[0] += movement[0]
+    temp_player[1] += movement[1]
 
     char_in_the_map = map_data[temp_player[0]][temp_player[1]]
     wall = "#"
